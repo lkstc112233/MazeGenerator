@@ -14,6 +14,30 @@
 #include <algorithm>
 #include <string>
 
+class PathNode
+{
+public:
+    PathNode *group;
+    PathNode()
+    : group(this)
+    {}
+    PathNode* Find()
+    {
+        if (this == group)
+            return this;
+        auto newGroup = group->Find();
+        group = newGroup;
+        return newGroup;
+    }
+    bool Union(PathNode* node)
+    {
+        if (node->Find() == Find())
+            return false;
+        Find()->group = node->Find();
+        return true;
+    }
+};
+
 class Maze
 {
 public:
@@ -61,6 +85,14 @@ public:
         
         delete[] array;
     }
+    
+    void fill(char* array, int x, int y)
+    {
+        int xbase = x * (pathWidth + wallWidth) + wallWidth;
+        int ybase = y * (pathWidth + wallWidth) + wallWidth;
+        
+    }
+    
     int getBitmapWidth()
     {
         return width * (pathWidth + wallWidth) + wallWidth;
