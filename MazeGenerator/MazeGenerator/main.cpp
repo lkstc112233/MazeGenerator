@@ -90,7 +90,11 @@ public:
                     allWalls.push_back(wall);
                 }
             }
-        
+        std::random_device rd;
+        std::mt19937 rand(rd());
+        std::shuffle(allWalls.begin(), allWalls.end(), rand);
+        for (auto wall: allWalls)
+            wall->breakWall();
     }
     
     ~Maze()
