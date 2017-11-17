@@ -15,10 +15,18 @@
 #include <vector>
 #include <random>
 
+enum NodeType
+{
+    Path,
+    Begin,
+    End,
+};
+
 class PathNode
 {
 public:
     PathNode *group;
+    NodeType type = Path;
     PathNode()
     : group(this)
     {}
@@ -95,6 +103,14 @@ public:
         std::shuffle(allWalls.begin(), allWalls.end(), rand);
         for (auto wall: allWalls)
             wall->breakWall();
+        int b = rand();
+        b %= width * height;
+        int e = rand();
+        e %= width * height;
+        while (b == e)
+            e = rand() % (width * height);
+        maze[b].type = Begin;
+        maze[e].type = End;
     }
     
     ~Maze()
@@ -154,13 +170,14 @@ public:
         int ybase = y * (pathWidth + wallWidth) + wallWidth;
         for (int i = 0; i < pathWidth; ++i)
         {
+            auto tp = maze[x + y * width].type;
             char color = -1;
             for (int j = 0; j < pathWidth; ++j)
             {
                 int index = (i + ybase) * getBitmapRowWidth() + (j + xbase) * 3;
-                array[index] = color;
-                array[index + 1] = color;
-                array[index + 2] = color;
+                array[index] = (tp == End || tp == Begin)? 0: color;
+                array[index + 1] = tp == End? 0: color;
+                array[index + 2] = tp == Begin? 0: color;
             }
             if (verticalWalls[x + y * width].block)
                 color = 0;
