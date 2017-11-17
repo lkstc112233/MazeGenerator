@@ -184,6 +184,7 @@ public:
                 array[index + 1] = color;
                 array[index + 2] = color;
             }
+            color = 0;
             for (int j = 0; j < wallWidth; ++j)
             {
                 int index = (i + ybase + pathWidth) * getBitmapRowWidth() + (j + xbase + pathWidth) * 3;
