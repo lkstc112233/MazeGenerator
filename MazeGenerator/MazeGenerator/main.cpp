@@ -38,6 +38,19 @@ public:
     }
 };
 
+class Wall
+{
+public:
+    PathNode* node1;
+    PathNode* node2;
+    bool block = true;
+    bool breakWall()
+    {
+        if (node1->Union(node2))
+            block = false;
+    }
+};
+
 class Maze
 {
 public:
