@@ -141,7 +141,6 @@ public:
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         // Bitmap Array
         char* array = getBitmapArray();
-        
         delete[] array;
     }
     
@@ -149,6 +148,46 @@ public:
     {
         int xbase = x * (pathWidth + wallWidth) + wallWidth;
         int ybase = y * (pathWidth + wallWidth) + wallWidth;
+        for (int i = 0; i < pathWidth; ++i)
+        {
+            char color = -1;
+            for (int j = 0; j < pathWidth; ++j)
+            {
+                int index = (i + ybase) * getBitmapRowWidth() + (j + xbase) * 3;
+                array[index] = color;
+                array[index + 1] = color;
+                array[index + 2] = color;
+            }
+            if (verticalWalls[x + y * width].block)
+                color = 0;
+            for (int j = 0; j < wallWidth; ++j)
+            {
+                int index = (i + ybase) * getBitmapRowWidth() + (j + xbase + pathWidth) * 3;
+                array[index] = color;
+                array[index + 1] = color;
+                array[index + 2] = color;
+            }
+        }
+        for (int i = 0; i < wallWidth; ++i)
+        {
+            char color = -1;
+            if (horizontalWalls[x + y * width].block)
+                color = 0;
+            for (int j = 0; j < pathWidth; ++j)
+            {
+                int index = (i + ybase + pathWidth) * getBitmapRowWidth() + (j + xbase) * 3;
+                array[index] = color;
+                array[index + 1] = color;
+                array[index + 2] = color;
+            }
+            for (int j = 0; j < wallWidth; ++j)
+            {
+                int index = (i + ybase + pathWidth) * getBitmapRowWidth() + (j + xbase + pathWidth) * 3;
+                array[index] = color;
+                array[index + 1] = color;
+                array[index + 2] = color;
+            }
+        }
         
     }
     
@@ -182,8 +221,43 @@ public:
 };
 
 int main(int argc, const char * argv[]) {
-    
-    
-    std::cout << "Hello, World!\n";
+    if (argc < 2)
+    {
+        std::cerr << argv[0] << " FileName [maze_width maze_height [path_width [wall_width]]]" << std::endl;
+        return 0;
+    }
+    int width = 40;
+    int height = 40;
+    int pwidth = 2;
+    int wwidth = 2;
+    std::string name = argv[1];
+    if (argc > 2)
+    {
+        if (argc < 4)
+        {
+            std::cerr << argv[0] << " FileName [maze_width maze_height [path_width [wall_width]]]" << std::endl;
+            return 0;
+        }
+        width = atoi(argv[2]);
+        height = atoi(argv[3]);
+        if (width == 0)
+            width = 40;
+        if (height == 0)
+            height = 40;
+        if (argc > 4)
+        {
+            pwidth = atoi(argv[4]);
+            if (pwidth == 0)
+                pwidth = 2;
+            if (argc > 5)
+            {
+                wwidth = atoi(argv[5]);
+                if (wwidth == 0)
+                    wwidth = 2;
+            }
+        }
+    }
+    Maze maze(width, height, pwidth, wwidth);
+    maze.write(name);
     return 0;
 }
