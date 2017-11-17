@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <cmath>
 
 enum NodeType
 {
@@ -50,8 +51,8 @@ public:
 class Wall
 {
 public:
-    PathNode* node1;
-    PathNode* node2;
+    PathNode* node1 = nullptr;
+    PathNode* node2 = nullptr;
     bool block = true;
     void breakWall()
     {
@@ -103,12 +104,15 @@ public:
         std::shuffle(allWalls.begin(), allWalls.end(), rand);
         for (auto wall: allWalls)
             wall->breakWall();
-        int b = rand();
+        int b = abs((int)rand());
         b %= width * height;
-        int e = rand();
+        int e = abs((int)rand());
         e %= width * height;
         while (b == e)
-            e = rand() % (width * height);
+        {
+            e = abs((int)rand());
+            e %= width * height;
+        }
         maze[b].type = Begin;
         maze[e].type = End;
     }
@@ -156,13 +160,96 @@ public:
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         // Bitmap Array
-        char* array = getBitmapArray();
-        for (int i = 0; i < width; ++i)
-            for (int j = 0; j < height; ++j)
-                fill(array, i, j);
-        ofs.write(array, getBitmapSize());
-        delete[] array;
+        int rowWidth = getBitmapRowWidth();
+        int padding = rowWidth - getBitmapWidth() * 3;
+        for (int i = 0; i < wallWidth; ++i)
+        {
+            int rw = getBitmapWidth();
+            for (int j = 0; j < rw; ++j)
+                ofs.write(BLACK, 3);
+            switch (padding) {
+                case 3:
+                    ofs.put(0);
+                case 2:
+                    ofs.put(0);
+                case 1:
+                    ofs.put(0);
+                default:
+                    break;
+            }
+        }
+        for (int i = 0; i < height; ++i)
+        {
+            for (int k = 0; k < pathWidth; ++k)
+            {
+                for (int j = 0; j < wallWidth; ++j)
+                    ofs.write(BLACK, 3);
+                for (int j = 0; j < width; ++j)
+                {
+                    auto tp = maze[j + i * width].type;
+                    const char* color = WHITE;
+                    switch (tp) {
+                        case Begin:
+                            color = RED;
+                            break;
+                        case End:
+                            color = GREEN;
+                            break;
+                        default:
+                            break;
+                    }
+                    for (int l = 0; l < pathWidth; ++l)
+                        ofs.write(color, 3);
+                    if (verticalWalls[j + i * width].block)
+                        color = BLACK;
+                    else
+                        color = WHITE;
+                    for (int l = 0; l < wallWidth; ++l)
+                        ofs.write(color, 3);
+                }
+                switch (padding) {
+                    case 3:
+                        ofs.put(0);
+                    case 2:
+                        ofs.put(0);
+                    case 1:
+                        ofs.put(0);
+                    default:
+                        break;
+                }
+            }
+            for (int k = 0; k < wallWidth; ++k)
+            {
+                for (int j = 0; j < wallWidth; ++j)
+                    ofs.write(BLACK, 3);
+                for (int j = 0; j < width; ++j)
+                {
+                    const char* color = WHITE;
+                    if (horizontalWalls[j + i * width].block)
+                        color = BLACK;
+                    for (int l = 0; l < pathWidth; ++l)
+                        ofs.write(color, 3);
+                    color = BLACK;
+                    for (int l = 0; l < wallWidth; ++l)
+                        ofs.write(color, 3);
+                }
+                switch (padding) {
+                    case 3:
+                        ofs.put(0);
+                    case 2:
+                        ofs.put(0);
+                    case 1:
+                        ofs.put(0);
+                    default:
+                        break;
+                }
+            }
+        }
     }
+    const char RED[3]={0,0,-1};
+    const char GREEN[3]={0,-1,0};
+    const char BLACK[3]={0,0,0};
+    const char WHITE[3]={-1,-1,-1};
     
     void fill(char* array, int x, int y)
     {
