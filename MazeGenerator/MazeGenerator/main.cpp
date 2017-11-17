@@ -141,6 +141,10 @@ public:
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         // Bitmap Array
         char* array = getBitmapArray();
+        for (int i = 0; i < width; ++i)
+            for (int j = 0; j < height; ++j)
+                fill(array, i, j);
+        ofs.write(array, getBitmapSize());
         delete[] array;
     }
     
