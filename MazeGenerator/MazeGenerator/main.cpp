@@ -57,6 +57,9 @@ public:
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         // Bitmap Array
+        char* array = getBitmapArray();
+        
+        delete[] array;
     }
     int getBitmapWidth()
     {
@@ -80,6 +83,10 @@ public:
     int getBitmapSize()
     {
         return getBitmapHeight() * getBitmapRowWidth();
+    }
+    char* getBitmapArray()
+    {
+        return new char[getBitmapSize()]();
     }
 };
 
