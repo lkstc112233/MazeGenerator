@@ -36,14 +36,41 @@ public:
         fourb = 54;
         ofs.write(reinterpret_cast<char*>(&fourb), 4);
         // DIB header
-        
+        fourb = 40;
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        fourb = getBitmapWidth();
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        fourb = getBitmapHeight();
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        twob = 1;
+        ofs.write(reinterpret_cast<char*>(&twob), 2);
+        twob = 24;
+        ofs.write(reinterpret_cast<char*>(&twob), 2);
+        fourb = 0;
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        fourb = getBitmapSize();
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        fourb = 0xb12;
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        fourb = 0;
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        ofs.write(reinterpret_cast<char*>(&fourb), 4);
+        // Bitmap Array
+    }
+    int getBitmapWidth()
+    {
+        return width * (pathWidth + wallWidth) + wallWidth;
     }
     
-    
+    int getBitmapHeight()
+    {
+        return height * (pathWidth + wallWidth) + wallWidth;
+    }
     
     int getBitmapRowWidth()
     {
-        return (24 * width + 31) / 32 * 4;
+        return (24 * getBitmapWidth() + 31) / 32 * 4;
     }
     
     int getFileSize()
@@ -52,7 +79,7 @@ public:
     }
     int getBitmapSize()
     {
-        return height * getBitmapRowWidth();
+        return getBitmapHeight() * getBitmapRowWidth();
     }
 };
 
