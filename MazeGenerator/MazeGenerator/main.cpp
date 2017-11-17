@@ -58,6 +58,28 @@ public:
     int height;
     int pathWidth;
     int wallWidth;
+    PathNode* maze;
+    Wall* horizontalWalls;
+    Wall* verticalWalls;
+    Maze(int wid, int hei, int patw, int walw)
+    : width(wid)
+    , height(hei)
+    , pathWidth(patw)
+    , wallWidth(walw)
+    {
+        maze = new PathNode[width * height];
+        horizontalWalls = new Wall[width * height];
+        verticalWalls = new Wall[width * height];
+        
+    }
+    
+    ~Maze()
+    {
+        delete[] maze;
+        delete[] horizontalWalls;
+        delete[] verticalWalls;
+    }
+    
     void write(std::string& fileName)
     {
         std::ofstream ofs(fileName, std::ios::binary);
