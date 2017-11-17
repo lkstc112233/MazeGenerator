@@ -10,9 +10,10 @@
 #include <fstream>
 #include <utility>
 #include <vector>
-#include <chrono>
 #include <algorithm>
 #include <string>
+#include <vector>
+#include <random>
 
 class PathNode
 {
@@ -70,6 +71,25 @@ public:
         maze = new PathNode[width * height];
         horizontalWalls = new Wall[width * height];
         verticalWalls = new Wall[width * height];
+        std::vector<Wall*> allWalls;
+        for (int i = 0; i < width; ++i)
+            for (int j = 0; j < height; ++j)
+            {
+                if (i < width - 1)
+                {
+                    auto wall = verticalWalls + j * width + i;
+                    wall->node1 = maze + j * width + i;
+                    wall->node2 = maze + j * width + i + 1;
+                    allWalls.push_back(wall);
+                }
+                if (j < height - 1)
+                {
+                    auto wall = horizontalWalls + j * width + i;
+                    wall->node1 = maze + j * width + i;
+                    wall->node2 = maze + (j + 1) * width + i;
+                    allWalls.push_back(wall);
+                }
+            }
         
     }
     
