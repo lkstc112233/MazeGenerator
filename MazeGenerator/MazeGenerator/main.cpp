@@ -54,10 +54,11 @@ public:
     PathNode* node1 = nullptr;
     PathNode* node2 = nullptr;
     bool block = true;
-    void breakWall()
+    bool breakWall()
     {
         if (node1->Union(node2))
             block = false;
+        return !block;
     }
 };
 
@@ -102,8 +103,14 @@ public:
         std::random_device rd;
         std::mt19937 rand(rd());
         std::shuffle(allWalls.begin(), allWalls.end(), rand);
+        int count = width * height;
         for (auto wall: allWalls)
-            wall->breakWall();
+        {
+            if (wall->breakWall())
+                count -= 1;
+            if (count == 1)
+                break;
+        }
         int b = abs((int)rand());
         b %= width * height;
         int e = abs((int)rand());
@@ -367,6 +374,8 @@ int main(int argc, const char * argv[]) {
         }
     }
     Maze maze(width, height, pwidth, wwidth);
+    std::cout << "Maze generated." << std::endl;
     maze.write(name);
+    std::cout << "Image generated." << std::endl;
     return 0;
 }
